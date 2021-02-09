@@ -28,3 +28,4 @@ kaffy-*.tar
 .elixir_ls
 .DS_Store
 .tool-versions
+.sass-cache
