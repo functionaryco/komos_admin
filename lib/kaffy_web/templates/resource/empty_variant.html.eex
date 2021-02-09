@@ -1,0 +1,2 @@
+<%=render "tab.html", conn: @conn, context: @context, product_id: @product_id %>
+<%=link "Create new variant", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :new, @context,@product_id, "variant") %>

@@ -1,0 +1,9 @@
+<div style="display:flex;width:100%">
+  <img src="">
+  <label style="width:50%">
+    <%=item_name(@item) %>
+  </label>
+  <label style= "width:15%"><%=item_price(@item)%></label>
+  <label style= "width:15%"><%=@item.quantity %></label>
+  <label style="width:20%"><%=line_total(@item) %>
+  </div>

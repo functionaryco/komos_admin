@@ -1,0 +1,20 @@
+<ul class="nav nav-pills">
+  <li class="nav-item">
+    <%= link "Product ", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :show, @context, "product",@product_id),class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "Variants   ", to: Kaffy.Utils.router().kaffy_product_path(@conn, :index, @context,@product_id, "variant"),class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "Images   ", to: Kaffy.Utils.router().kaffy_product_path(@conn, :new, @context,@product_id, "image"), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "Prices   ", to: Kaffy.Utils.router().kaffy_product_path(@conn, :index, @context,@product_id, "price"), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "Product Properties  ", to: Kaffy.Utils.router().kaffy_product_path(@conn, :index, @context,@product_id, "product_property"), class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "Stock   ", to: Kaffy.Utils.router().kaffy_product_path(@conn, :index, @context,@product_id, "stock_item"), class: "nav-link" %>
+  </li>
+</ul>

@@ -1,0 +1,6 @@
+<div style="display:flex;width:100%">
+  <%= inputs_for @form, :option_value, [], fn fp -> %>
+  <%= text_input fp, :name %>
+  <%=text_input fp,:presentation %>
+<% end %>
+</div>
