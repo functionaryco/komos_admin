@@ -61,11 +61,11 @@ defmodule Kaffy.ResourceCallbacks do
 
     repo.transaction(fn ->
       result =
-        with {:ok, changeset} <- before_update(conn, resource, changeset),
+        with {:ok, _entry} <- before_customer_update(conn, resource, entry),
              {:ok, changeset} <- before_save(conn, resource, changeset),
-             {:ok, entry} <- exec_update(conn, resource, changeset),
+             {:ok, entry} <- update_customer(conn, resource, changeset),
              {:ok, entry} <- after_save(conn, resource, entry),
-             do: after_update(conn, resource, entry)
+             do: after_customer_update(conn, resource, entry)
 
       case result do
         {:ok, entry} -> entry
@@ -154,6 +154,16 @@ defmodule Kaffy.ResourceCallbacks do
     )
   end
 
+  defp before_customer_update(conn, resource, entry) do
+    Utils.get_assigned_value_or_default(
+      resource,
+      :before_customer_update,
+      {:ok, entry},
+      [conn, entry],
+      false
+    )
+  end
+
   defp before_save(conn, resource, changeset) do
     Utils.get_assigned_value_or_default(
       resource,
@@ -166,6 +176,16 @@ defmodule Kaffy.ResourceCallbacks do
 
   defp after_save(conn, resource, entry) do
     Utils.get_assigned_value_or_default(resource, :after_save, {:ok, entry}, [conn, entry], false)
+  end
+
+  defp update_customer(conn, resource, changeset) do
+    Utils.get_assigned_value_or_default(
+      resource,
+      :update_customer,
+      {:error, :not_found},
+      [conn, changeset],
+      false
+    )
   end
 
   defp update(conn, resource, changeset) do
@@ -182,6 +202,16 @@ defmodule Kaffy.ResourceCallbacks do
     Utils.get_assigned_value_or_default(
       resource,
       :after_update,
+      {:ok, entry},
+      [conn, entry],
+      false
+    )
+  end
+
+  defp after_customer_update(conn, resource, entry) do
+    Utils.get_assigned_value_or_default(
+      resource,
+      :after_customer_update,
       {:ok, entry},
       [conn, entry],
       false
