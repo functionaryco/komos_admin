@@ -86,6 +86,14 @@ defmodule Kaffy.Routes do
 
         get("/orders/cart/:context/:resource/:order_id", OrderController, :cart, as: :kaffy_order)
 
+        get("/orders/address/:context/:resource/:order_id", OrderController, :new_address,
+          as: :kaffy_order
+        )
+
+        post("/orders/address/:context/:resource/:order_id", OrderController, :create_address,
+          as: :kaffy_order
+        )
+
         put("orders/customers/:context/:resource/:order_id", OrderController, :update_customer,
           as: :kaffy_order
         )
