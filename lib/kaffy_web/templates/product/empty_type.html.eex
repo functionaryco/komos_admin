@@ -1,0 +1,1 @@
+<center>This product has no associated option values. Add some to it through Option Types in the <%= link "Product details", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :show, @context,"product",@product_id)  %></center>

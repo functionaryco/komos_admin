@@ -1,0 +1,1 @@
+<center>No variants found <%= link "Create one", to: Kaffy.Utils.router().kaffy_product_path(@conn, :new, @context,@product_id, @resource)  %></center>

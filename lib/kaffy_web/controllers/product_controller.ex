@@ -86,6 +86,69 @@ defmodule KaffyWeb.ProductController do
     end
   end
 
+  def index(
+        conn,
+        %{"context" => context, "product_id" => id, "resource" => "variant" = resource} = params
+      ) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    params = Map.delete(params, "product_id")
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        if entries |> length() < 2 do
+          product_resource = Kaffy.Utils.get_resource(conn, context, "product")
+          entry = Kaffy.ResourceQuery.fetch_resource(conn, product_resource, id)
+
+          if entry.option_types |> length() < 1 do
+            render(conn, "empty_type.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              context: context,
+              resource: resource,
+              product_id: id
+            )
+          else
+            render(conn, "empty_variant.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              context: context,
+              resource: resource,
+              product_id: id
+            )
+          end
+        else
+          render(conn, "child_index.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            context: context,
+            resource: resource,
+            fields: fields,
+            my_resource: my_resource,
+            filtered_count: filtered_count,
+            page: page,
+            has_next_page: has_next,
+            next_class: next_class,
+            has_prev_page: has_prev,
+            prev_class: prev_class,
+            list_pages: list_pages,
+            entries: entries,
+            params: params,
+            product_id: id
+          )
+        end
+    end
+  end
+
   def index(conn, %{"context" => context, "product_id" => id, "resource" => resource} = params) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
     params = Map.delete(params, "product_id")
