@@ -335,12 +335,14 @@ defmodule Kaffy.ResourceForm do
   end
 
   def get_field_error(changeset, field) do
-    changeset
-    |> build_error_messages()
-    |> Map.get(field)
+    errors =
+      changeset
+      |> build_error_messages()
+
+    Map.get(errors, field)
     |> case do
       nil ->
-        {nil, ""}
+        check_errors(errors, field)
 
       # # In case of field is a embedded schema
       %{} ->
@@ -352,6 +354,27 @@ defmodule Kaffy.ResourceForm do
 
         {error_msg, "is-invalid"}
     end
+  end
+
+  defp check_errors(errors, field) do
+    errors |> Map.values() |> Enum.filter(fn x -> is_map(x) end) |> assoc_errors(field)
+  end
+
+  defp assoc_errors([errors | errors_list], field) do
+    case Map.get(errors, field) do
+      nil ->
+        case check_errors(errors, field) do
+          {nil, ""} -> assoc_errors(errors_list, field)
+          {error_msg, "is-invalid"} -> {error_msg, "is-invalid"}
+        end
+
+      error_msg ->
+        {error_msg, "is-invalid"}
+    end
+  end
+
+  defp assoc_errors([], _field) do
+    {nil, ""}
   end
 
   defp build_error_messages(changeset) do

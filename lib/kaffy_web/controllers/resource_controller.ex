@@ -259,52 +259,6 @@ defmodule KaffyWeb.ResourceController do
     end
   end
 
-  # def show(conn, %{"context" => context, "resource" => "order" = resource, "id" => id}) do
-  #   my_resource = Kaffy.Utils.get_resource(conn, context, resource)
-  #   schema = my_resource[:schema]
-  #   resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
-
-  #   case can_proceed?(my_resource, conn) do
-  #     false ->
-  #       unauthorized_access(conn)
-
-  #     true ->
-  #       if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
-  #         entry =
-  #           Map.merge(entry, %{
-  #             price: entry.master_variant.price.amount,
-  #             sku: entry.master_variant.sku,
-  #             weight: entry.master_variant.weight,
-  #             height: entry.master_variant.height,
-  #             width: entry.master_variant.width,
-  #             depth: entry.master_variant.depth,
-  #             cost_currency: entry.master_variant.cost_currency,
-  #             cost_price: entry.master_variant.cost_price,
-  #             currency: entry.master_variant.price.currency
-  #           })
-  #           |> Map.drop([:master_variant])
-
-  #         changeset = Ecto.Changeset.change(entry)
-
-  #         render(conn, "show.html",
-  #           layout: {KaffyWeb.LayoutView, "app.html"},
-  #           changeset: changeset,
-  #           context: context,
-  #           resource: resource,
-  #           my_resource: my_resource,
-  #           resource_name: resource_name,
-  #           schema: schema,
-  #           entry: entry
-  #         )
-  #       else
-  #         put_flash(conn, :error, "The resource you are trying to visit does not exist!")
-  #         |> redirect(
-  #           to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
-  #         )
-  #       end
-  #   end
-  # end
-
   def show(conn, %{"context" => context, "resource" => "product" = resource, "id" => id}) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
     schema = my_resource[:schema]
@@ -316,21 +270,7 @@ defmodule KaffyWeb.ResourceController do
 
       true ->
         if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
-          entry =
-            Map.merge(entry, %{
-              price: entry.master_variant.price.amount,
-              sku: entry.master_variant.sku,
-              weight: entry.master_variant.weight,
-              height: entry.master_variant.height,
-              width: entry.master_variant.width,
-              depth: entry.master_variant.depth,
-              cost_currency: entry.master_variant.cost_currency,
-              cost_price: entry.master_variant.cost_price,
-              currency: entry.master_variant.price.currency
-            })
-            |> Map.drop([:master_variant])
-
-          changeset = Ecto.Changeset.change(entry)
+          changeset = Kaffy.ResourceAdmin.update_changeset(my_resource, entry, %{})
 
           render(conn, "tab_show.html",
             layout: {KaffyWeb.LayoutView, "app.html"},
@@ -351,37 +291,6 @@ defmodule KaffyWeb.ResourceController do
     end
   end
 
-  # def show(conn, %{"context" => context, "resource" => "option_type" = resource, "id" => id}) do
-  #   my_resource = Kaffy.Utils.get_resource(conn, context, resource)
-  #   schema = my_resource[:schema]
-  #   resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
-
-  #   case can_proceed?(my_resource, conn) do
-  #     false ->
-  #       unauthorized_access(conn)
-
-  #     true ->
-  #       if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
-  #         changeset = Ecto.Changeset.change(entry)
-
-  #         render(conn, "show_option_type.html",
-  #           layout: {KaffyWeb.LayoutView, "app.html"},
-  #           changeset: changeset,
-  #           context: context,
-  #           resource: resource,
-  #           my_resource: my_resource,
-  #           resource_name: resource_name,
-  #           schema: schema,
-  #           entry: entry
-  #         )
-  #       else
-  #         put_flash(conn, :error, "The resource you are trying to visit does not exist!")
-  #         |> redirect(
-  #           to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
-  #         )
-  #       end
-  #   end
-  # end
   def show(conn, %{
         "context" => context,
         "resource" => "variant" = resource,
