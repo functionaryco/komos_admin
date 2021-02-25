@@ -4,7 +4,7 @@ defmodule KaffyWeb.ResourceController do
   use Phoenix.Controller, namespace: KaffyWeb
   use Phoenix.HTML
   alias Kaffy.Pagination
-  alias KaffyWeb.OrderView
+  alias KaffyWeb.ProductView
 
   def index(
         conn,
@@ -592,28 +592,10 @@ defmodule KaffyWeb.ResourceController do
                       resource
                     )
                 )
-
-              "Save and add another" ->
-                conn
-                |> put_flash(:success, "#{resource_name} saved successfully")
-                |> redirect(
-                  to:
-                    Kaffy.Utils.router().kaffy_resource_path(
-                      conn,
-                      :new,
-                      context,
-                      product_id,
-                      resource
-                    )
-                )
-
-              "Save and continue editing" ->
-                put_flash(conn, :success, "Created a new #{resource_name} successfully")
-                |> redirect_to_resource(context, resource, entry)
             end
 
           {:error, %Ecto.Changeset{} = changeset} ->
-            render(conn, "new_product_image.html",
+            render(conn, ProductView, "new_product_image.html",
               layout: {KaffyWeb.LayoutView, "app.html"},
               changeset: changeset,
               context: context,
@@ -629,7 +611,7 @@ defmodule KaffyWeb.ResourceController do
 
             conn
             |> put_flash(:error, error)
-            |> render("new_product_image.html",
+            |> render(ProductView, "new_product_image.html",
               layout: {KaffyWeb.LayoutView, "app.html"},
               changeset: changeset,
               context: context,

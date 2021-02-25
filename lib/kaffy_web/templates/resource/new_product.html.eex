@@ -21,6 +21,7 @@
                       <% end  %>
                     <% end %>
                 <% end %>
+                 <%= multiple_select(f, :taxons,  [], selected: [], hidden: true, class: "taxons-input") %>
                 </div>
                     <div style="width:30%;margin-left:50px">
                  <%= for {field, options} <- Kaffy.ResourceAdmin.form_fields(@my_resource) do %>

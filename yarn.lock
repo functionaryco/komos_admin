@@ -11,3 +11,8 @@ compass-mixins@^0.12.10:
   version "0.12.10"
   resolved "https://registry.yarnpkg.com/compass-mixins/-/compass-mixins-0.12.10.tgz#cd9f15f829c4e960cc43bb226f049b28beb99d41"
   integrity sha1-zZ8V+CnE6WDMQ7sibwSbKL65nUE=
+
+taggle@^1.15.0:
+  version "1.15.0"
+  resolved "https://registry.yarnpkg.com/taggle/-/taggle-1.15.0.tgz#d2efb65872886ea199f39c19ddb4f30b5e205ae9"
+  integrity sha512-NW/9NcXj8ZYk1kBojNB9svp4XvpnsS03ryyMLJ6BiHrbDtnL5x1Kf1ASlKsJvnp1bQNuulppo2xQtieu0Qh1yg==
