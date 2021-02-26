@@ -97,6 +97,8 @@ defmodule Kaffy.Routes do
         put("orders/customers/:context/:resource/:order_id", OrderController, :update_customer,
           as: :kaffy_order
         )
+
+        put("/:context/:resource/:id", ResourceController, :stock_update, as: :kaffy_resource)
       end
     end
   end

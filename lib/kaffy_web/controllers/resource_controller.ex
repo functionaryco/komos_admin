@@ -222,6 +222,46 @@ defmodule KaffyWeb.ResourceController do
     end
   end
 
+  def index(
+        conn,
+        %{"context" => "stock" = context, "resource" => "stock_item" = resource} = params
+      ) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        render(conn, "stock_list.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          context: context,
+          resource: resource,
+          fields: fields,
+          my_resource: my_resource,
+          filtered_count: filtered_count,
+          page: page,
+          has_next_page: has_next,
+          next_class: next_class,
+          has_prev_page: has_prev,
+          prev_class: prev_class,
+          list_pages: list_pages,
+          entries: entries,
+          params: params
+        )
+    end
+  end
+
   def index(conn, %{"context" => context, "resource" => resource} = params) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
 
@@ -738,6 +778,84 @@ defmodule KaffyWeb.ResourceController do
               resource: resource,
               resource_name: resource_name,
               my_resource: my_resource
+            )
+        end
+    end
+  end
+
+  def stock_update(
+        conn,
+        %{
+          "context" => context,
+          "resource" => "stock_item" = resource,
+          "id" => id
+        } = params
+      ) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    schema = my_resource[:schema]
+    params = Kaffy.ResourceParams.decode_map_fields(resource, schema, params)
+
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource) |> String.capitalize()
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id)
+        changes = Map.get(params, resource, %{})
+
+        case Kaffy.ResourceCallbacks.update_callbacks(conn, my_resource, entry, changes) do
+          {:ok, _entry} ->
+            conn = put_flash(conn, :success, "#{resource_name} saved successfully")
+
+            save_button = Map.get(params, "submit", "Save")
+
+            case save_button do
+              "Save" ->
+                conn
+                |> put_flash(:success, "#{resource_name} saved successfully")
+                |> redirect(
+                  to:
+                    Kaffy.Utils.router().kaffy_resource_path(
+                      conn,
+                      :index,
+                      context,
+                      resource
+                    )
+                )
+            end
+
+          {:error, %Ecto.Changeset{}} ->
+            conn =
+              put_flash(
+                conn,
+                :error,
+                "A problem occurred while trying to save this #{resource}"
+              )
+
+            redirect(conn,
+              to:
+                Kaffy.Utils.router().kaffy_resource_path(
+                  conn,
+                  :index,
+                  context,
+                  resource
+                )
+            )
+
+          {:error, {_entry, error}} when is_binary(error) ->
+            conn = put_flash(conn, :error, error)
+            # changeset = Ecto.Changeset.change(entry)
+
+            redirect(conn,
+              to:
+                Kaffy.Utils.router().kaffy_resource_path(
+                  conn,
+                  :index,
+                  context,
+                  resource
+                )
             )
         end
     end

@@ -158,6 +158,7 @@ defmodule Kaffy.ResourceSchema do
 
   def kaffy_field_value(conn, schema, {field, options}) do
     default_value = kaffy_field_value(schema, field)
+
     ft = Kaffy.ResourceSchema.field_type(schema.__struct__, field)
     value = Map.get(options || %{}, :value)
 
