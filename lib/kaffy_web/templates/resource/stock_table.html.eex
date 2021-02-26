@@ -14,8 +14,8 @@
           <div style="display:flex;">
             <div style="margin-right: 20px;"><%=img_tag(Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:image_url, @fields[:image_url]}), border: 1, height: 100, width: 100) %></div>
             <div>
-              <div>SKU:<%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:sku,@fields[:sku]}) %></div>
-              <div>Name:<%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:product,@fields[:product]}) %></div>
+              <div>SKU: <%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:sku,@fields[:sku]}) %></div>
+              <div>Name: <%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:product,@fields[:product]}) %></div>
             </div>
           </div>
         </td>
