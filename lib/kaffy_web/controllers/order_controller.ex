@@ -74,51 +74,6 @@ defmodule KaffyWeb.OrderController do
     )
   end
 
-  def order_customer(conn, %{
-        "context" => context,
-        "resource" => "order" = resource,
-        "order_id" => id
-      }) do
-    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
-    schema = my_resource[:schema]
-    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
-
-    customer_resource = Kaffy.Utils.get_resource(conn, "account", "user")
-    address_resource = Kaffy.Utils.get_resource(conn, "account", "address")
-
-    {_filtered_count, customers_list} =
-      Kaffy.ResourceQuery.list_resource(conn, customer_resource, %{})
-
-    case can_proceed?(my_resource, conn) do
-      false ->
-        unauthorized_access(conn)
-
-      true ->
-        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
-          changeset = Ecto.Changeset.change(entry)
-
-          render(conn, "order_customer.html",
-            layout: {KaffyWeb.LayoutView, "app.html"},
-            changeset: changeset,
-            context: context,
-            resource: resource,
-            my_resource: my_resource,
-            resource_name: resource_name,
-            customer_resource: customer_resource,
-            schema: schema,
-            entry: entry,
-            users: customers_list,
-            address_resource: address_resource
-          )
-        else
-          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
-          |> redirect(
-            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
-          )
-        end
-    end
-  end
-
   def cart(conn, %{
         "context" => context,
         "resource" => "order" = resource,
@@ -158,6 +113,138 @@ defmodule KaffyWeb.OrderController do
             items: items_list,
             variants: variants_list,
             cart_changeset: cart_changeset
+          )
+        else
+          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
+          |> redirect(
+            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+          )
+        end
+    end
+  end
+
+  def new_address(conn, %{"context" => context, "resource" => resource, "order_id" => order_id}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        changeset = Kaffy.ResourceAdmin.create_changeset(my_resource, %{}) |> Map.put(:errors, [])
+
+        render(conn, "new_address.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          changeset: changeset,
+          context: context,
+          resource: resource,
+          resource_name: resource_name,
+          my_resource: my_resource,
+          order_id: order_id
+        )
+    end
+  end
+
+  def create_address(
+        conn,
+        %{"context" => context, "resource" => resource, "order_id" => order_id} = params
+      ) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    params = Kaffy.ResourceParams.decode_map_fields(resource, my_resource[:schema], params)
+    changes = Map.get(params, resource, %{})
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        case Kaffy.ResourceCallbacks.create_callbacks(conn, my_resource, changes) do
+          {:ok, _entry} ->
+            case Map.get(params, "submit", "Save") do
+              "Save" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect(
+                  to:
+                    Kaffy.Utils.router().kaffy_order_path(
+                      conn,
+                      :order_customer,
+                      "order",
+                      "order",
+                      order_id
+                    )
+                )
+            end
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, "new_address.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource,
+              order_id: order_id
+            )
+
+          {:error, {entry, error}} when is_binary(error) ->
+            changeset = Ecto.Changeset.change(entry)
+
+            conn
+            |> put_flash(:error, error)
+            |> render("new_address.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource,
+              order_id: order_id
+            )
+        end
+    end
+  end
+
+  def order_customer(conn, %{
+        "context" => context,
+        "resource" => "order" = resource,
+        "order_id" => id
+      }) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    schema = my_resource[:schema]
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    customer_resource = Kaffy.Utils.get_resource(conn, "account", "user")
+    address_resource = Kaffy.Utils.get_resource(conn, "account", "address")
+
+    {_filtered_count, customers_list} =
+      Kaffy.ResourceQuery.list_resource(conn, customer_resource, %{})
+
+    {_filtered_count, address_list} =
+      Kaffy.ResourceQuery.list_resource(conn, address_resource, %{})
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
+          changeset = Ecto.Changeset.change(entry)
+
+          render(conn, "order_customer.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            changeset: changeset,
+            context: context,
+            resource: resource,
+            my_resource: my_resource,
+            resource_name: resource_name,
+            customer_resource: customer_resource,
+            schema: schema,
+            entry: entry,
+            users: customers_list,
+            address_resource: address_resource,
+            address_list: address_list
           )
         else
           put_flash(conn, :error, "The resource you are trying to visit does not exist!")
@@ -216,7 +303,7 @@ defmodule KaffyWeb.OrderController do
               put_flash(
                 conn,
                 :error,
-                "A problem occurred while trying to save this #{resource}"
+                "A problem occurred while trying to save this #{resource} "
               )
 
             conn
@@ -238,6 +325,34 @@ defmodule KaffyWeb.OrderController do
             |> redirect(
               to: Kaffy.Utils.router().kaffy_order_path(conn, :order_customer, context, resource)
             )
+        end
+    end
+  end
+
+  def order_shipment(conn, %{"context" => context, "resource" => resource, "id" => id}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
+          render(conn, "order_shipment.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            context: context,
+            resource: resource,
+            my_resource: my_resource,
+            resource_name: resource_name,
+            entry: entry
+          )
+        else
+          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
+          |> redirect(
+            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+          )
         end
     end
   end

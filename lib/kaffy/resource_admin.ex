@@ -100,6 +100,16 @@ defmodule Kaffy.ResourceAdmin do
     |> set_default_field_options(schema)
   end
 
+  def product_image_url(resource, product) do
+    Utils.get_assigned_value_or_default(
+      resource,
+      :image_url,
+      "",
+      [product],
+      false
+    )
+  end
+
   defp set_default_field_options(fields, schema) do
     Enum.map(fields, fn {f, o} ->
       default_options = Kaffy.ResourceSchema.default_field_options(schema, f)

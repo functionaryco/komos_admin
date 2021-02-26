@@ -21,7 +21,7 @@ defmodule KaffyWeb.OrderView do
   end
 
   def total_price(item) do
-    item.variant.price.amount * item.quantity
+    item.price * item.quantity
   end
 
   def line_total(item) do
@@ -30,5 +30,11 @@ defmodule KaffyWeb.OrderView do
 
   def item_total(items) do
     Enum.reduce(items, 0.0, fn x, acc -> acc + total_price(x) end) |> Decimal.from_float()
+  end
+
+  def address_text(address) do
+    "#{address.firstname} #{address.lastname} Addr: #{address.address1} #{address.address2} City: #{
+      address.city
+    }-#{address.zipcode}"
   end
 end
