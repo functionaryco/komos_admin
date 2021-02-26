@@ -21,6 +21,9 @@
                       <% end  %>
                     <% end %>
                 <% end %>
+
+                <div id="product_taxons_select"></div>
+
                 </div>
                     <div style="width:30%;margin-left:50px">
                  <%= for {field, options} <- Kaffy.ResourceAdmin.form_fields(@my_resource) do %>

@@ -1,0 +1,36 @@
+<table class="table table-striped">
+  <thead>
+    <th>Item</th>
+    <th>Variant</th>
+    <th>Stock Location</th>
+    <th>Back Orderable</th>
+    <th>Count on hand</th>
+    <th>Modify(+/-)</th>
+  </thead>
+  <tbody>
+    <%= for entry <- @entries do %>
+      <tr>
+        <td>
+          <div style="display:flex;">
+            <div style="margin-right: 20px;"><%=img_tag(Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:image_url, @fields[:image_url]}), border: 1, height: 100, width: 100) %></div>
+            <div>
+              <div>SKU: <%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:sku,@fields[:sku]}) %></div>
+              <div>Name: <%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:product,@fields[:product]}) %></div>
+            </div>
+          </div>
+        </td>
+        <td>
+          <div>
+            <p><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:variant_id,@fields[:variant_id]})%></p>
+          </div>
+        </td>
+        <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:stock_location_id,@fields[:stock_location_id]}) %></td>
+        <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:back_orderable,@fields[:back_orderable]}) %></td>
+        <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:count_on_hand, @fields[:count_on_hand]}) %></td>
+        <td>
+          <%=render "stock_count_update.html",conn: @conn,context: @context, resource: @resource,changeset: Ecto.Changeset.change(entry)%>
+        </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

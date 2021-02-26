@@ -3,7 +3,8 @@
   "description": "Powerfully simple admin package for phoenix applications",
   "dependencies": {
     "bootstrap": "^4.5.0",
-    "compass-mixins": "^0.12.10"
+    "compass-mixins": "^0.12.10",
+    "taggle": "^1.15.0"
   },
   "author": "aesmail",
   "url": "https://github.com/functionaryco/komos_admin",
