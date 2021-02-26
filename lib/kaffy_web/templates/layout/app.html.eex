@@ -144,6 +144,8 @@
         </div>
       </div>
     </div>
+
+
     <script src="/kaffy/assets/vendors/flatpickr/flatpickr.min.js"></script>
     <script src="/kaffy/assets/vendors/chart.js/Chart.min.js"></script>
     <script src="/kaffy/assets/vendors/js/ckeditor.js"></script>
@@ -153,6 +155,8 @@
     <script src="/kaffy/assets/js/select-all-checkbox.js?v=20"></script>
     <script src="/kaffy/assets/js/phoenix_html.js"></script>
     <script src="/kaffy/assets/js/dashboard.js?v=20"></script>
+    <script src="https://github.com/okcoker/taggle.js.git"></script>
+    <script src="/kaffy/assets/js/multi-select.js"></script>
     <%= for js <- Kaffy.Utils.extensions(@conn).javascripts do %>
       <%= js %>
     <% end %>
