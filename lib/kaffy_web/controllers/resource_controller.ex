@@ -227,6 +227,7 @@ defmodule KaffyWeb.ResourceController do
         %{"context" => "stock" = context, "resource" => "stock_item" = resource} = params
       ) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    sl_resource = Kaffy.Utils.get_resource(conn, context, "stock_location")
 
     case can_proceed?(my_resource, conn) do
       false ->
@@ -235,6 +236,12 @@ defmodule KaffyWeb.ResourceController do
       true ->
         fields = Kaffy.ResourceAdmin.index(my_resource)
         {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+
+        {_filtered_count, stock_locations} =
+          Kaffy.ResourceQuery.list_resource(conn, sl_resource, params)
+
+        stock_locations = stock_locations |> Enum.map(fn x -> {x.name, x.name} end)
+
         items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
         page = Map.get(params, "page", "1") |> String.to_integer()
         has_next = round(filtered_count / items_per_page) > page
@@ -257,6 +264,7 @@ defmodule KaffyWeb.ResourceController do
           prev_class: prev_class,
           list_pages: list_pages,
           entries: entries,
+          stock_locations: stock_locations,
           params: params
         )
     end
