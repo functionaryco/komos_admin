@@ -50,7 +50,9 @@
               <%= Kaffy.ResourceForm.kaffy_input @conn, @changeset, fvp, field, options %>
             <% end  %>
           <% end %>
-          <%= Kaffy.ResourceForm.kaffy_input @conn, @changeset, fv, field, options %>
+          <%= if options.input== :variant do %>
+            <%= Kaffy.ResourceForm.kaffy_input @conn, @changeset, fv, field, options %>
+          <%= end %>
         <% end %>
       <% end  %>
     <% end %>
