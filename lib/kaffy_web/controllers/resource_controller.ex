@@ -586,6 +586,28 @@ defmodule KaffyWeb.ResourceController do
     end
   end
 
+  def new(conn, %{"context" => context, "resource" => "zone" = resource}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        changeset = Kaffy.ResourceAdmin.create_changeset(my_resource, %{}) |> Map.put(:errors, [])
+
+        render(conn, "new_zone.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          changeset: changeset,
+          context: context,
+          resource: resource,
+          resource_name: resource_name,
+          my_resource: my_resource
+        )
+    end
+  end
+
   def new(conn, %{"context" => context, "resource" => resource}) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
     resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)

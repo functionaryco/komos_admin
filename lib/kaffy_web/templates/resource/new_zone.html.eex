@@ -1,0 +1,73 @@
+<%= for error <- Kaffy.ResourceError.display_errors(@conn, @changeset) do %>
+  <div><%= error %></div>
+<% end %>
+<div class="mt-3 grid-margin stretch-card">
+  <div class="card shadow <%= Kaffy.ResourceError.form_error_border_class(@changeset, "border-left-primary")%>">
+        <div class="card-header">
+            <div class="row justify-content-between">
+                <div class="col-auto mr-auto">
+                    <h1 class="mt-4">New <%= Kaffy.ResourceAdmin.singular_name(@my_resource) %></h1>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <%= f = form_for(@changeset, Kaffy.Utils.router().kaffy_resource_path(@conn, :create, @context, @resource), method: :post, multipart: true) %>
+            <div style="display:flex;">
+            <div style="margin-right:20px;">
+                <%= for {field, options} <- Kaffy.ResourceAdmin.form_fields(@my_resource) do %>
+                    <%= if options.create != :hidden do %>
+                     <%= if options.pos==:left do %>
+                        <%= Kaffy.ResourceForm.kaffy_input @conn, @changeset, f, field, options %>
+                    <% end %>
+                    <% end %>
+                <% end %>
+                <%=checkbox f, :zoneable_type_spec, onchange: "zoneableTypeSwitch(this)", value: false %> <label>State based</label>
+            </div>
+
+            <div>
+            <%= for {field, options} <- Kaffy.ResourceAdmin.form_fields(@my_resource) do %>
+                    <%= if options.create != :hidden do %>
+                     <%= if options.pos==:right do %>
+                        <%= Kaffy.ResourceForm.kaffy_input @conn, @changeset, f, field, options %>
+                    <% end %>
+                    <% end %>
+                <% end %>
+           </div>
+           </div>
+                <div class="form-group">
+                    <%= link "Back", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, @context, @resource), class: "btn btn-sm btn-light" %> &nbsp;
+                    <input type="submit" name="submit" value="Save" class="btn btn-sm btn-primary" />
+  <input type="submit" name="submit" value="Save and add another" class="btn btn-sm btn-primary" />
+  <input type="submit" name="submit" value="Save and continue editing" class="btn btn-sm btn-primary" />
+</div>
+</form>
+</div>
+</div>
+</div>
+<script>
+  function zoneableTypeSwitch(checkboxElem) {
+    if (checkboxElem.checked) {
+  
+   document.getElementById("zone_state_id").style.display="";
+  $("label[for='zone_Country']").hide();
+     $("label[for='zone_State']").show();
+   document.getElementById("zone_country_id").style.display="none";
+  
+  
+    } else {
+  
+   document.getElementById("zone_country_id").style.display="";
+     $("label[for='zone_Country']").show();
+       $("label[for='zone_State']").hide();
+   document.getElementById("zone_state_id").style.display="none";
+  
+    }
+    }
+    function hideElements(){
+       document.getElementById("zone_country_id").style.display="";
+     $("label[for='zone_Country']").show();
+       $("label[for='zone_State']").hide();
+   document.getElementById("zone_state_id").style.display="none";
+    }
+    window.onload=hideElements
+</script>
