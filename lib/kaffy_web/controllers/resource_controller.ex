@@ -228,6 +228,7 @@ defmodule KaffyWeb.ResourceController do
       ) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
     sl_resource = Kaffy.Utils.get_resource(conn, context, "stock_location")
+    sm_resource = Kaffy.Utils.get_resource(conn, context, "stock_movement")
 
     case can_proceed?(my_resource, conn) do
       false ->
@@ -236,6 +237,9 @@ defmodule KaffyWeb.ResourceController do
       true ->
         fields = Kaffy.ResourceAdmin.index(my_resource)
         {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+
+        stock_movement_changeset =
+          Kaffy.ResourceAdmin.create_changeset(sm_resource, %{}) |> Map.put(:errors, [])
 
         {_filtered_count, stock_locations} =
           Kaffy.ResourceQuery.list_resource(conn, sl_resource, params)
@@ -265,7 +269,8 @@ defmodule KaffyWeb.ResourceController do
           list_pages: list_pages,
           entries: entries,
           stock_locations: stock_locations,
-          params: params
+          params: params,
+          sm_changeset: stock_movement_changeset
         )
     end
   end
@@ -956,6 +961,43 @@ defmodule KaffyWeb.ResourceController do
               resource: resource,
               resource_name: resource_name,
               my_resource: my_resource
+            )
+        end
+    end
+  end
+
+  def create(conn, %{"context" => context, "resource" => "stock_movement" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    params = Kaffy.ResourceParams.decode_map_fields(resource, my_resource[:schema], params)
+    changes = Map.get(params, resource, %{})
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        case Kaffy.ResourceCallbacks.create_callbacks(conn, my_resource, changes) do
+          {:ok, _entry} ->
+            case Map.get(params, "submit", "Save") do
+              "Save" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect(
+                  to:
+                    Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, "stock_item")
+                )
+            end
+
+          {:error, %Ecto.Changeset{} = _changeset} ->
+            put_flash(conn, :error, "An error occurd")
+            |> redirect(
+              to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, "stock_item")
+            )
+
+          {:error, {_entry, error}} when is_binary(error) ->
+            put_flash(conn, :error, "An error occurd")
+            |> redirect(
+              to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, "stock_item")
             )
         end
     end
