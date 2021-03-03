@@ -275,6 +275,117 @@ defmodule KaffyWeb.ResourceController do
     end
   end
 
+  def index(conn, %{"context" => context, "resource" => "shipment_method" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        render(conn, "shipment_method_index.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          context: context,
+          resource: resource,
+          fields: fields,
+          my_resource: my_resource,
+          filtered_count: filtered_count,
+          page: page,
+          has_next_page: has_next,
+          next_class: next_class,
+          has_prev_page: has_prev,
+          prev_class: prev_class,
+          list_pages: list_pages,
+          entries: entries,
+          params: params
+        )
+    end
+  end
+
+  def index(conn, %{"context" => context, "resource" => "shipment_category" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        render(conn, "shipment_category_index.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          context: context,
+          resource: resource,
+          fields: fields,
+          my_resource: my_resource,
+          filtered_count: filtered_count,
+          page: page,
+          has_next_page: has_next,
+          next_class: next_class,
+          has_prev_page: has_prev,
+          prev_class: prev_class,
+          list_pages: list_pages,
+          entries: entries,
+          params: params
+        )
+    end
+  end
+
+  def index(conn, %{"context" => context, "resource" => "stock_location" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        render(conn, "stock_location_index.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          context: context,
+          resource: resource,
+          fields: fields,
+          my_resource: my_resource,
+          filtered_count: filtered_count,
+          page: page,
+          has_next_page: has_next,
+          next_class: next_class,
+          has_prev_page: has_prev,
+          prev_class: prev_class,
+          list_pages: list_pages,
+          entries: entries,
+          params: params
+        )
+    end
+  end
+
   def index(conn, %{"context" => context, "resource" => resource} = params) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
 
@@ -711,6 +822,28 @@ defmodule KaffyWeb.ResourceController do
         changeset = Kaffy.ResourceAdmin.create_changeset(my_resource, %{}) |> Map.put(:errors, [])
 
         render(conn, "new.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          changeset: changeset,
+          context: context,
+          resource: resource,
+          resource_name: resource_name,
+          my_resource: my_resource
+        )
+    end
+  end
+
+  def new(conn, %{"context" => context, "resource" => "stock_location" = resource}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        changeset = Kaffy.ResourceAdmin.create_changeset(my_resource, %{}) |> Map.put(:errors, [])
+
+        render(conn, "new_stock_location.html",
           layout: {KaffyWeb.LayoutView, "app.html"},
           changeset: changeset,
           context: context,
