@@ -33,7 +33,7 @@
                 <% end %>
                 </div>
                 </div>
-                <center>Settings</center>
+                <center><h3>Settings</h3></center>
                  <div style="display:flex;">
                  <div style="width:50%;margin-right:20px;">
                 <%= for {field, options} <- Kaffy.ResourceAdmin.form_fields(@my_resource) do %>

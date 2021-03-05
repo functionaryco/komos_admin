@@ -207,6 +207,16 @@ defmodule Kaffy.Utils do
     get_in(full_resources(conn), [context, :visible]) || false
   end
 
+  def edit_and_delete_from_index?(conn, context, resource) do
+    resource = get_resource(conn, context, resource)
+
+    resource[:edit_delete_index]
+    |> case do
+      nil -> true
+      v -> v
+    end
+  end
+
   @doc """
   Returns the context list from the configs for a specific schema.
 
