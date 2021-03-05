@@ -11,11 +11,11 @@
             <label class="custom-control-label" for="kaffy-select-<%= entry.id %>"></label>
           </div>
         </td>
-        <%= for {field, index} <- Enum.with_index(@fields) do %>
+        <%= for {field, _index} <- Enum.with_index(@fields) do %>
           <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, field) %></td>
         <% end %>
         <%= if Kaffy.Utils.edit_and_delete_from_index?(@conn,@context,@resource) do %>
-          <td><%=link "Edit", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :show, @context, @resource, entry.id) %>  <%=link "Delete", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :delete, @context, @resource, entry.id) %></td>
+          <td><%=link "Edit", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :show, @context, @resource, entry.id) %>  <%=link "Delete", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :delete, @context, @resource, entry.id),method: :delete %></td>
         <% end %>
       </tr>
     <% end %>
