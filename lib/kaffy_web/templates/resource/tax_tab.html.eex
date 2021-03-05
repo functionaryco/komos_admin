@@ -1,0 +1,8 @@
+<ul class="nav nav-pills">
+  <li class="nav-item">
+    <%= link "Tax Categories", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, "tax", "tax_category"),class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "Tax rates", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, "tax", "tax_rate"),class: "nav-link" %>
+  </li>
+</ul>
