@@ -877,8 +877,6 @@ defmodule KaffyWeb.ResourceController do
   end
 
   def new(conn, %{"context" => context, "resource" => resource}) do
-    require IEx
-    IEx.pry()
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
     resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
 
