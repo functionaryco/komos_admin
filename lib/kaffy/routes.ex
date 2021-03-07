@@ -35,6 +35,14 @@ defmodule Kaffy.Routes do
         get("/tasks", TaskController, :index, as: :kaffy_task)
         get("/p/:slug", PageController, :index, as: :kaffy_page)
         get("/:context/:resource", ResourceController, :index, as: :kaffy_resource)
+
+        get(
+          "stock/movments/:context/:resource/:stock_location_id",
+          ResourceController,
+          :movement_index,
+          as: :kaffy_resource
+        )
+
         post("/:context/:resource", ResourceController, :create, as: :kaffy_resource)
 
         post("/:context/:resource/:id/action/:action_key", ResourceController, :single_action,
@@ -99,6 +107,7 @@ defmodule Kaffy.Routes do
         )
 
         put("/:context/:resource/:id", ResourceController, :stock_update, as: :kaffy_resource)
+        # Stock movement index
       end
     end
   end
