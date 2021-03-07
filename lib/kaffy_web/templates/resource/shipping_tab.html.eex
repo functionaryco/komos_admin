@@ -1,0 +1,11 @@
+<ul class="nav nav-pills">
+  <li class="nav-item">
+    <%= link "Shipment Methods", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, "shipment", "shipment_method"),class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "Shipment categories", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, "shipment", "shipment_category"),class: "nav-link" %>
+  </li>
+  <li class="nav-item">
+    <%= link "Stock Locations", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :index, "stock", "stock_location"), class: "nav-link" %>
+  </li>
+</ul>

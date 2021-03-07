@@ -207,6 +207,36 @@ defmodule Kaffy.Utils do
     get_in(full_resources(conn), [context, :visible]) || false
   end
 
+  def self_navigating?(conn, context) do
+    get_in(full_resources(conn), [context, :route])
+    |> case do
+      nil -> false
+      _ -> true
+    end
+  end
+
+  def route_to(conn, context) do
+    get_in(full_resources(conn), [context, :route])
+  end
+
+  @doc """
+  Checks the index table should contain link to edit and delete the  entry
+  ### Parameters
+  * conn - The Plug.Conn struct
+  * context - context of the module
+  * resource - resource name of the module
+  """
+  @spec edit_and_delete_from_index?(Plug.Conn.t(), atom(), atom()) :: boolean()
+  def edit_and_delete_from_index?(conn, context, resource) do
+    resource = get_resource(conn, context, resource)
+
+    resource[:edit_delete_index]
+    |> case do
+      nil -> true
+      v -> v
+    end
+  end
+
   @doc """
   Returns the context list from the configs for a specific schema.
 
@@ -262,6 +292,33 @@ defmodule Kaffy.Utils do
   def schemas_for_context(conn, context) do
     context = convert_to_atom(context)
     get_in(full_resources(conn), [context, :resources])
+  end
+
+  @doc """
+  Check weather the context has children
+  Example:
+
+    iex> with_children("order")
+    false
+  """
+  @spec with_children?(Plug.Conn.t(), list()) :: boolean()
+  def with_children?(conn, context) do
+    context = convert_to_atom(context)
+
+    get_in(full_resources(conn), [context, :children])
+    |> case do
+      nil -> false
+      _ -> true
+    end
+  end
+
+  @doc """
+  Returns all childref of the given context
+  """
+  @spec children_of_context(Plug.Conn.t(), list()) :: list()
+  def children_of_context(conn, context) do
+    context = convert_to_atom(context)
+    get_in(full_resources(conn), [context, :children])
   end
 
   # @doc """

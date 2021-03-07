@@ -228,6 +228,7 @@ defmodule KaffyWeb.ResourceController do
       ) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
     sl_resource = Kaffy.Utils.get_resource(conn, context, "stock_location")
+    sm_resource = Kaffy.Utils.get_resource(conn, context, "stock_movement")
 
     case can_proceed?(my_resource, conn) do
       false ->
@@ -236,6 +237,9 @@ defmodule KaffyWeb.ResourceController do
       true ->
         fields = Kaffy.ResourceAdmin.index(my_resource)
         {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+
+        stock_movement_changeset =
+          Kaffy.ResourceAdmin.create_changeset(sm_resource, %{}) |> Map.put(:errors, [])
 
         {_filtered_count, stock_locations} =
           Kaffy.ResourceQuery.list_resource(conn, sl_resource, params)
@@ -265,12 +269,205 @@ defmodule KaffyWeb.ResourceController do
           list_pages: list_pages,
           entries: entries,
           stock_locations: stock_locations,
+          params: params,
+          sm_changeset: stock_movement_changeset
+        )
+    end
+  end
+
+  def index(conn, %{"context" => context, "resource" => "shipment_method" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        render(conn, "shipment_method_index.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          context: context,
+          resource: resource,
+          fields: fields,
+          my_resource: my_resource,
+          filtered_count: filtered_count,
+          page: page,
+          has_next_page: has_next,
+          next_class: next_class,
+          has_prev_page: has_prev,
+          prev_class: prev_class,
+          list_pages: list_pages,
+          entries: entries,
+          params: params
+        )
+    end
+  end
+
+  def index(conn, %{"context" => "tax" = context, "resource" => resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        render(conn, "tax_index.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          context: context,
+          resource: resource,
+          fields: fields,
+          my_resource: my_resource,
+          filtered_count: filtered_count,
+          page: page,
+          has_next_page: has_next,
+          next_class: next_class,
+          has_prev_page: has_prev,
+          prev_class: prev_class,
+          list_pages: list_pages,
+          entries: entries,
+          params: params
+        )
+    end
+  end
+
+  def index(conn, %{"context" => context, "resource" => "shipment_category" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        render(conn, "shipment_category_index.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          context: context,
+          resource: resource,
+          fields: fields,
+          my_resource: my_resource,
+          filtered_count: filtered_count,
+          page: page,
+          has_next_page: has_next,
+          next_class: next_class,
+          has_prev_page: has_prev,
+          prev_class: prev_class,
+          list_pages: list_pages,
+          entries: entries,
+          params: params
+        )
+    end
+  end
+
+  def index(conn, %{"context" => context, "resource" => "stock_location" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        render(conn, "stock_location_index.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          context: context,
+          resource: resource,
+          fields: fields,
+          my_resource: my_resource,
+          filtered_count: filtered_count,
+          page: page,
+          has_next_page: has_next,
+          next_class: next_class,
+          has_prev_page: has_prev,
+          prev_class: prev_class,
+          list_pages: list_pages,
+          entries: entries,
           params: params
         )
     end
   end
 
   def index(conn, %{"context" => context, "resource" => resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        fields = Kaffy.ResourceAdmin.index(my_resource)
+        {filtered_count, entries} = Kaffy.ResourceQuery.list_resource(conn, my_resource, params)
+        items_per_page = Map.get(params, "limit", "100") |> String.to_integer()
+        page = Map.get(params, "page", "1") |> String.to_integer()
+        has_next = round(filtered_count / items_per_page) > page
+        next_class = if has_next, do: "", else: " disabled"
+        has_prev = page >= 2
+        prev_class = if has_prev, do: "", else: " disabled"
+        list_pages = Pagination.get_pages(page, ceil(filtered_count / items_per_page))
+
+        render(conn, "index.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          context: context,
+          resource: resource,
+          fields: fields,
+          my_resource: my_resource,
+          filtered_count: filtered_count,
+          page: page,
+          has_next_page: has_next,
+          next_class: next_class,
+          has_prev_page: has_prev,
+          prev_class: prev_class,
+          list_pages: list_pages,
+          entries: entries,
+          params: params
+        )
+    end
+  end
+
+  def movement_index(
+        conn,
+        %{
+          "context" => context,
+          "resource" => "stock_movement" = resource,
+          "stock_location_id" => _location_id
+        } = params
+      ) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
 
     case can_proceed?(my_resource, conn) do
@@ -366,6 +563,134 @@ defmodule KaffyWeb.ResourceController do
             schema: schema,
             entry: entry,
             product_id: entry.product_id
+          )
+        else
+          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
+          |> redirect(
+            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+          )
+        end
+    end
+  end
+
+  def show(conn, %{"context" => context, "resource" => "shipment_method" = resource, "id" => id}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    schema = my_resource[:schema]
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
+          changeset = Ecto.Changeset.change(entry)
+
+          render(conn, "show_shipment_method.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            changeset: changeset,
+            context: context,
+            resource: resource,
+            my_resource: my_resource,
+            resource_name: resource_name,
+            schema: schema,
+            entry: entry
+          )
+        else
+          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
+          |> redirect(
+            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+          )
+        end
+    end
+  end
+
+  def show(conn, %{"context" => context, "resource" => "stock_location" = resource, "id" => id}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    schema = my_resource[:schema]
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
+          changeset = Ecto.Changeset.change(entry)
+
+          render(conn, "show_stock_location.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            changeset: changeset,
+            context: context,
+            resource: resource,
+            my_resource: my_resource,
+            resource_name: resource_name,
+            schema: schema,
+            entry: entry
+          )
+        else
+          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
+          |> redirect(
+            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+          )
+        end
+    end
+  end
+
+  def show(conn, %{"context" => context, "resource" => "tax_rate" = resource, "id" => id}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    schema = my_resource[:schema]
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
+          changeset = Ecto.Changeset.change(entry)
+
+          render(conn, "show_shipment_method.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            changeset: changeset,
+            context: context,
+            resource: resource,
+            my_resource: my_resource,
+            resource_name: resource_name,
+            schema: schema,
+            entry: entry
+          )
+        else
+          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
+          |> redirect(
+            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+          )
+        end
+    end
+  end
+
+  def show(conn, %{"context" => context, "resource" => "zone" = resource, "id" => id}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    schema = my_resource[:schema]
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
+          changeset = Ecto.Changeset.change(entry)
+
+          render(conn, "show_zone.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            changeset: changeset,
+            context: context,
+            resource: resource,
+            my_resource: my_resource,
+            resource_name: resource_name,
+            schema: schema,
+            entry: entry
           )
         else
           put_flash(conn, :error, "The resource you are trying to visit does not exist!")
@@ -608,6 +933,94 @@ defmodule KaffyWeb.ResourceController do
     end
   end
 
+  def new(conn, %{"context" => context, "resource" => "shipment_method" = resource}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        changeset = Kaffy.ResourceAdmin.create_changeset(my_resource, %{}) |> Map.put(:errors, [])
+
+        render(conn, "new_shipment_method.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          changeset: changeset,
+          context: context,
+          resource: resource,
+          resource_name: resource_name,
+          my_resource: my_resource
+        )
+    end
+  end
+
+  def new(conn, %{"context" => context, "resource" => "tax_rate" = resource}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        changeset = Kaffy.ResourceAdmin.create_changeset(my_resource, %{}) |> Map.put(:errors, [])
+
+        render(conn, "new_shipment_method.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          changeset: changeset,
+          context: context,
+          resource: resource,
+          resource_name: resource_name,
+          my_resource: my_resource
+        )
+    end
+  end
+
+  def new(conn, %{"context" => context, "resource" => "payment_method" = resource}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        changeset = Kaffy.ResourceAdmin.create_changeset(my_resource, %{}) |> Map.put(:errors, [])
+
+        render(conn, "new_shipment_method.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          changeset: changeset,
+          context: context,
+          resource: resource,
+          resource_name: resource_name,
+          my_resource: my_resource
+        )
+    end
+  end
+
+  def new(conn, %{"context" => context, "resource" => "stock_location" = resource}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        changeset = Kaffy.ResourceAdmin.create_changeset(my_resource, %{}) |> Map.put(:errors, [])
+
+        render(conn, "new_stock_location.html",
+          layout: {KaffyWeb.LayoutView, "app.html"},
+          changeset: changeset,
+          context: context,
+          resource: resource,
+          resource_name: resource_name,
+          my_resource: my_resource
+        )
+    end
+  end
+
   def new(conn, %{"context" => context, "resource" => resource}) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
     resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
@@ -743,6 +1156,347 @@ defmodule KaffyWeb.ResourceController do
             conn
             |> put_flash(:error, error)
             |> render("new_product.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+        end
+    end
+  end
+
+  def create(
+        conn,
+        %{"context" => context, "resource" => "shipment_method" = resource} = params
+      ) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    params = Kaffy.ResourceParams.decode_map_fields(resource, my_resource[:schema], params)
+    changes = Map.get(params, resource, %{})
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        case Kaffy.ResourceCallbacks.create_callbacks(conn, my_resource, changes) do
+          {:ok, entry} ->
+            case Map.get(params, "submit", "Save") do
+              "Save" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+                )
+
+              "Save and add another" ->
+                conn
+                |> put_flash(:success, "#{resource_name} saved successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :new, context, resource)
+                )
+
+              "Save and continue editing" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect_to_resource(context, resource, entry)
+            end
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, "new_shipment_method.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+
+          {:error, {entry, error}} when is_binary(error) ->
+            changeset = Ecto.Changeset.change(entry)
+
+            conn
+            |> put_flash(:error, error)
+            |> render("new_shipment_method.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+        end
+    end
+  end
+
+  def create(
+        conn,
+        %{"context" => context, "resource" => "payment_method" = resource} = params
+      ) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    params = Kaffy.ResourceParams.decode_map_fields(resource, my_resource[:schema], params)
+    changes = Map.get(params, resource, %{})
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        case Kaffy.ResourceCallbacks.create_callbacks(conn, my_resource, changes) do
+          {:ok, entry} ->
+            case Map.get(params, "submit", "Save") do
+              "Save" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+                )
+
+              "Save and add another" ->
+                conn
+                |> put_flash(:success, "#{resource_name} saved successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :new, context, resource)
+                )
+
+              "Save and continue editing" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect_to_resource(context, resource, entry)
+            end
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, "new_shipment_method.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+
+          {:error, {entry, error}} when is_binary(error) ->
+            changeset = Ecto.Changeset.change(entry)
+
+            conn
+            |> put_flash(:error, error)
+            |> render("new_shipment_method.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+        end
+    end
+  end
+
+  def create(
+        conn,
+        %{"context" => context, "resource" => "tax_rate" = resource} = params
+      ) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    params = Kaffy.ResourceParams.decode_map_fields(resource, my_resource[:schema], params)
+    changes = Map.get(params, resource, %{})
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        case Kaffy.ResourceCallbacks.create_callbacks(conn, my_resource, changes) do
+          {:ok, entry} ->
+            case Map.get(params, "submit", "Save") do
+              "Save" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+                )
+
+              "Save and add another" ->
+                conn
+                |> put_flash(:success, "#{resource_name} saved successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :new, context, resource)
+                )
+
+              "Save and continue editing" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect_to_resource(context, resource, entry)
+            end
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, "new_shipment_method.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+
+          {:error, {entry, error}} when is_binary(error) ->
+            changeset = Ecto.Changeset.change(entry)
+
+            conn
+            |> put_flash(:error, error)
+            |> render("new_shipment_method.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+        end
+    end
+  end
+
+  def create(conn, %{"context" => context, "resource" => "zone" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    params = Kaffy.ResourceParams.decode_map_fields(resource, my_resource[:schema], params)
+    changes = Map.get(params, resource, %{})
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        case Kaffy.ResourceCallbacks.create_callbacks(conn, my_resource, changes) do
+          {:ok, entry} ->
+            case Map.get(params, "submit", "Save") do
+              "Save" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+                )
+
+              "Save and add another" ->
+                conn
+                |> put_flash(:success, "#{resource_name} saved successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :new, context, resource)
+                )
+
+              "Save and continue editing" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect_to_resource(context, resource, entry)
+            end
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, "new_zone.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+
+          {:error, {entry, error}} when is_binary(error) ->
+            changeset = Ecto.Changeset.change(entry)
+
+            conn
+            |> put_flash(:error, error)
+            |> render("new_zone.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+        end
+    end
+  end
+
+  def create(conn, %{"context" => context, "resource" => "stock_movement" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    params = Kaffy.ResourceParams.decode_map_fields(resource, my_resource[:schema], params)
+    changes = Map.get(params, resource, %{})
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        case Kaffy.ResourceCallbacks.create_callbacks(conn, my_resource, changes) do
+          {:ok, _entry} ->
+            case Map.get(params, "submit", "Save") do
+              "Save" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect(
+                  to:
+                    Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, "stock_item")
+                )
+            end
+
+          {:error, %Ecto.Changeset{} = _changeset} ->
+            put_flash(conn, :error, "An error occurd")
+            |> redirect(
+              to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, "stock_item")
+            )
+
+          {:error, {_entry, error}} when is_binary(error) ->
+            put_flash(conn, :error, "An error occurd")
+            |> redirect(
+              to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, "stock_item")
+            )
+        end
+    end
+  end
+
+  def create(conn, %{"context" => context, "resource" => "stock_location" = resource} = params) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    params = Kaffy.ResourceParams.decode_map_fields(resource, my_resource[:schema], params)
+    changes = Map.get(params, resource, %{})
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        case Kaffy.ResourceCallbacks.create_callbacks(conn, my_resource, changes) do
+          {:ok, entry} ->
+            case Map.get(params, "submit", "Save") do
+              "Save" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+                )
+
+              "Save and add another" ->
+                conn
+                |> put_flash(:success, "#{resource_name} saved successfully")
+                |> redirect(
+                  to: Kaffy.Utils.router().kaffy_resource_path(conn, :new, context, resource)
+                )
+
+              "Save and continue editing" ->
+                put_flash(conn, :success, "Created a new #{resource_name} successfully")
+                |> redirect_to_resource(context, resource, entry)
+            end
+
+          {:error, %Ecto.Changeset{} = changeset} ->
+            render(conn, "new_stock_location.html",
+              layout: {KaffyWeb.LayoutView, "app.html"},
+              changeset: changeset,
+              context: context,
+              resource: resource,
+              resource_name: resource_name,
+              my_resource: my_resource
+            )
+
+          {:error, {entry, error}} when is_binary(error) ->
+            changeset = Ecto.Changeset.change(entry)
+
+            conn
+            |> put_flash(:error, error)
+            |> render("new_stock_location.html",
               layout: {KaffyWeb.LayoutView, "app.html"},
               changeset: changeset,
               context: context,
