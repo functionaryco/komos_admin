@@ -1,21 +1,34 @@
 <table class="table table-striped">
   <thead>
-    <%= render KaffyWeb.ResourceView, "_table_header.html", my_resource: @my_resource, fields: @fields, params: @params %>
+    <th>Item</th>
+    <th>Variant</th>
+    <th>Stock Location</th>
+    <th>Back Orderable</th>
+    <th>Count on hand</th>
+    <th>Modify(+/-)</th>
   </thead>
   <tbody>
     <%= for entry <- @entries do %>
       <tr>
         <td>
-          <div class="custom-control custom-checkbox">
-            <input type="checkbox" class="custom-control-input select-item kaffy-resource-checkbox" id="kaffy-select-<%= entry.id %>" name="resource" value="<%= entry.id %>"/>
-            <label class="custom-control-label" for="kaffy-select-<%= entry.id %>"></label>
+          <div style="display:flex;">
+            <div style="margin-right: 20px;"><%=img_tag(Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:image_url, @fields[:image_url]}), border: 1, height: 100, width: 100) %></div>
+            <div>
+              <div>SKU: <%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:sku,@fields[:sku]}) %></div>
+              <div>Name: <%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:product,@fields[:product]}) %></div>
+            </div>
           </div>
         </td>
-        <%= for {field, index} <- Enum.with_index(@fields) do %>
-          <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, field) %></td>
-        <% end %>
         <td>
-          <%=render "stock_count_update.html",conn: @conn,context: @context, resource: @resource,changeset: Ecto.Changeset.change(entry),product_id: @product_id %>
+          <div>
+            <p><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:variant_id,@fields[:variant_id]})%></p>
+          </div>
+        </td>
+        <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:stock_location_id,@fields[:stock_location_id]}) %></td>
+        <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:back_orderable,@fields[:back_orderable]}) %></td>
+        <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:count_on_hand, @fields[:count_on_hand]}) %></td>
+        <td>
+          <%=render "stock_count_update.html",conn: @conn,context: @context, resource: @resource,changeset: @sm_changeset, stock_item_id: entry.id, product_id: @product_id%>
         </td>
       </tr>
     <% end %>
