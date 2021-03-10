@@ -1141,7 +1141,8 @@ defmodule KaffyWeb.ResourceController do
             end
 
           {:error, %Ecto.Changeset{} = changeset} ->
-            render(conn, "new_product.html",
+            put_flash(conn, :error, "Some errors occurd")
+            |> render("new_product.html",
               layout: {KaffyWeb.LayoutView, "app.html"},
               changeset: changeset,
               context: context,

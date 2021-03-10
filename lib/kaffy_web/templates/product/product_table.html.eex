@@ -11,7 +11,7 @@
         <td><%= link entry.master_variant.sku, to: Kaffy.Utils.router().kaffy_resource_path(@conn, :show, @context, @resource, entry.id) %></td>
         <td><%= img_tag(Kaffy.ResourceAdmin.product_image_url(@my_resource,entry), border: 1, height: 200, width: 200)%></td>
         <td><%= entry.name%></td>
-        <td><%= entry.master_variant.price.amount %>
+        <td><%= entry.master_variant.price.amount|>Decimal.from_float() %>
           <td><%=link "Delete", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :delete, @context, @resource, entry.id), method: :delete %> <%=link "Edit", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :show, @context, @resource, entry.id) %></td>
         </tr>
       <% end %>

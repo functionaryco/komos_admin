@@ -72,7 +72,9 @@ defmodule Kaffy.Routes do
         )
 
         get("products/:context/:id/:resource/new", ProductController, :new, as: :kaffy_product)
+
         post("products/:context/:id/:resource", ProductController, :create, as: :kaffy_product)
+
         # get("/orders/:context/:resource/new", OrderController, :new, as: :kaffy_order)
 
         put("products/:context/:product_id/:resource/:id", ProductController, :update,

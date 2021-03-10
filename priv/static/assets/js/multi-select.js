@@ -1,5 +1,5 @@
-import Taggle from "taggle";
+// import Taggle from "taggle";
 
-new Taggle('product_taxons_select', {
-    tags: ['These', 'are', 'prefilled', 'tags']
-});
+// new Taggle('product_taxons_select', {
+//     tags: ['These', 'are', 'prefilled', 'tags']
+// });
