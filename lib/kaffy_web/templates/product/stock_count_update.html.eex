@@ -1,6 +1,7 @@
- <%= f = form_for(@changeset, Kaffy.Utils.router().kaffy_product_path(@conn, :update, @context,@product_id, @resource, @changeset.data.id), method: :put, multipart: true) %>
+ <%= f = form_for(@changeset, Kaffy.Utils.router().kaffy_product_path(@conn, :create, @context,@product_id, "stock_movement"), multipart: true) %>
 <div style="display:flex;">
-  <%= text_input f, :count_on_hand %>
+  <%= number_input f, :quantity %>
+  <%= hidden_input f, :stock_item_id, value: @stock_item_id %>
   <%= submit "Update" %>
 </div>
 </form>
