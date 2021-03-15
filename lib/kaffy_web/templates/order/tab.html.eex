@@ -6,10 +6,10 @@
     <%= link "Customer", to: Kaffy.Utils.router().kaffy_order_path(@conn, :order_customer, @context, @resource,@order_id),class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <%= link "Shipment ", to: Kaffy.Utils.router().kaffy_product_path(@conn, :new, @context,@order_id, "image"), class: "nav-link" %>
+    <%= link "Shipment ", to: Kaffy.Utils.router().kaffy_resource_path(@conn, :show, @context,@resource, @order_id), class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <%= link "Adjustments", to: Kaffy.Utils.router().kaffy_product_path(@conn, :index, @context,@order_id, "price"), class: "nav-link" %>
+    <%= link "Adjustments", to: Kaffy.Utils.router().kaffy_order_path(@conn, :adjustments, @context,@resource, @order_id), class: "nav-link" %>
   </li>
   <li class="nav-item">
     <%= link "Payments", to: Kaffy.Utils.router().kaffy_product_path(@conn, :index, @context,@order_id, "product_property"), class: "nav-link" %>

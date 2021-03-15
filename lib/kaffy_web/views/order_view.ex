@@ -37,4 +37,9 @@ defmodule KaffyWeb.OrderView do
       address.city
     }-#{address.zipcode}"
   end
+
+  def adjustment_name(conn, context, resource, adjustment) do
+    resource = Kaffy.Utils.get_resource(conn, context, resource)
+    Kaffy.ResourceCallbacks.adjustment_label(conn, resource, adjustment)
+  end
 end

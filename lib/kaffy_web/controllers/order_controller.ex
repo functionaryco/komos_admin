@@ -255,6 +255,46 @@ defmodule KaffyWeb.OrderController do
     end
   end
 
+  def adjustments(conn, %{
+        "context" => context,
+        "resource" => "order" = resource,
+        "order_id" => id
+      }) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    schema = my_resource[:schema]
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    adjustments_resource = Kaffy.Utils.get_resource(conn, "calculation", "adjustment")
+
+    {_filtered_count, adjustments_list} =
+      Kaffy.ResourceQuery.list_resource(conn, adjustments_resource, %{})
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
+          render(conn, "adjustments_index.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            context: context,
+            resource: resource,
+            my_resource: my_resource,
+            resource_name: resource_name,
+            schema: schema,
+            entry: entry,
+            adjustments: adjustments_list,
+            order_id: id
+          )
+        else
+          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
+          |> redirect(
+            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+          )
+        end
+    end
+  end
+
   def update_customer(
         conn,
         %{"context" => context, "resource" => resource, "order_id" => id} = params
@@ -276,7 +316,7 @@ defmodule KaffyWeb.OrderController do
         entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id)
         changes = Map.get(params, resource, %{})
 
-        case Kaffy.ResourceCallbacks.customer_update_callbacks(conn, my_resource, entry, changes) do
+        case Kaffy.ResourceCallbacks.update_callbacks(conn, my_resource, entry, changes) do
           {:ok, entry} ->
             conn = put_flash(conn, :success, "#{resource_name} saved successfully")
 

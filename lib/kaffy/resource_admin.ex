@@ -277,7 +277,7 @@ defmodule Kaffy.ResourceAdmin do
   end
 
   def customer_update_params(params) do
-    if params["order"]["same_address"] do
+    if params["order"]["same_address"] == "true" do
       bill_address = params["order"]["bill_address"]
       order_params = Map.put(params["order"], "ship_address", bill_address)
       Map.put(params, "order", order_params)

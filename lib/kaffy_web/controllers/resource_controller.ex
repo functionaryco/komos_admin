@@ -701,6 +701,38 @@ defmodule KaffyWeb.ResourceController do
     end
   end
 
+  def show(conn, %{"context" => context, "resource" => "order" = resource, "id" => id}) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, resource)
+    schema = my_resource[:schema]
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
+          changeset = Ecto.Changeset.change(entry)
+
+          render(conn, "order_shipments.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            changeset: changeset,
+            context: context,
+            resource: resource,
+            my_resource: my_resource,
+            resource_name: resource_name,
+            schema: schema,
+            order: entry
+          )
+        else
+          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
+          |> redirect(
+            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+          )
+        end
+    end
+  end
+
   def show(conn, %{"context" => context, "resource" => resource, "id" => id}) do
     my_resource = Kaffy.Utils.get_resource(conn, context, resource)
     schema = my_resource[:schema]

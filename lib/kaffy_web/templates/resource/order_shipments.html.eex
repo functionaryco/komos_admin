@@ -1,0 +1,30 @@
+<div class="mt-3 grid-margin stretch-card">
+  <div class="card shadow <%= Kaffy.ResourceError.form_error_border_class(@changeset, "border-left-success")%>">
+    <div class="card-header">
+      <%=render KaffyWeb.OrderView,"tab.html", conn: @conn, context: @context, order_id: @changeset.data.id, resource: "order" %>
+    </div>
+    <div class="card-body">
+      <div>
+        <%=render KaffyWeb.OrderView,"order_items.html", conn: @conn, items: @order.items %>
+      </div>
+      <hr>
+      <h4><%=shipment_name(@conn, @context,@resource, @order.shipment)%></h4>
+      <i>No tracking details provided</i>
+      <hr>
+      <hr>
+      <b>Shipment Number: </b><%=@order.shipment.number %>
+      <hr>
+      <b>Shipment date: </b><%=@order.shipment.shipped_at %>
+      <hr>
+      <%=if @order.line_item_adjustments|>length !=0 do %>
+        <center>Line item adjustments</center>
+        <%=render KaffyWeb.OrderView, "adjustments.html", conn: @conn,context: @context, resource: @resource, adjustments: @order.line_item_adjustments %>
+      <% end %>
+      <%= if @order.shipment_adjustments|>length !=0 do %>
+        <center>Shipment adjustments</center>
+        <%=render KaffyWeb.OrderView, "adjustments.html", conn: @conn,context: @context, resource: @resource, adjustments: @order.shipment_adjustments %>
+      <% end %>
+    </div>
+  </div>
+  <!-- Modal -->
+</div>
