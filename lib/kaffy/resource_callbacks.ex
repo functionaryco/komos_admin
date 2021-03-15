@@ -132,6 +132,26 @@ defmodule Kaffy.ResourceCallbacks do
     )
   end
 
+  def adjustment_label(conn, resource, adjustment) do
+    Utils.get_assigned_value_or_default(
+      resource,
+      :adjustment_label,
+      "",
+      [conn, adjustment],
+      false
+    )
+  end
+
+  def shipment_name(conn, resource, shipment) do
+    Utils.get_assigned_value_or_default(
+      resource,
+      :shipment_name,
+      "default",
+      [conn, shipment],
+      false
+    )
+  end
+
   defp after_insert(conn, resource, entry) do
     Utils.get_assigned_value_or_default(
       resource,

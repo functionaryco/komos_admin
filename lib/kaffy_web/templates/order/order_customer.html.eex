@@ -17,12 +17,12 @@
         <%=checkbox f, :guest_checkout, onchange: "guestCheckout(this)" %>
       </div>
       <div>
-        <div id="same_address_check" style="display:none;width:100%">
+        <div id="same_address_check" style="display:flex;width:100%">
           <div style="width:50%"></div>
           <%= checkbox f, :same_address, onchange: "sameAddress(this)"%>
           <label>Use Billing address</label>
         </div>
-        <div id="guest_address" style="display:none;width:100%;">
+        <div id="guest_address" style="display:flex;width:100%;">
           <div style="width:50%">
             <legend align="center">Billing address</legend>
             <%=inputs_for f,:bill_address, fn fb-> %>
@@ -44,13 +44,6 @@
         <% end %>
       </div>
     </div>
-    <div id="user_address" >
-      <label>Bill address</label>
-      <%= select f,:bill_address_id,Enum.map(@address_list,fn x-> {address_text(x), x.id} end), class: "form-control"%>
-      <label>Ship address</label>
-      <%= select f,:ship_address_id,Enum.map(@address_list,fn x-> {address_text(x), x.id} end), class: "form-control"%>
-    </div>
-    <%= link "Add new", to: Kaffy.Utils.router().kaffy_order_path(@conn, :new_address, "account","address",@changeset.data.id)  %>
     <div class="form-group">
       <input type="submit" name="submit" value="Save" class="btn btn-sm btn-primary" />
     </div>
@@ -76,13 +69,10 @@
    function guestCheckout(checkboxElem) {
   if (checkboxElem.checked) {
   document.getElementById("order_user_id").value="";
-    document.getElementById("guest_address").style.display="flex";
-    document.getElementById("same_address_check").style.display="flex";
-    document.getElementById("user_address").style.display="none";
+  
   } else {
-   document.getElementById("guest_address").style.display="none";
-    document.getElementById("same_address_check").style.display="none";
-    document.getElementById("user_address").style.display="";
+  
+  
   }
   }
 </script>

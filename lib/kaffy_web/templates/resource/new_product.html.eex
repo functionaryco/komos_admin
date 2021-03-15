@@ -38,11 +38,11 @@
                          <% end %>
                            <%= inputs_for fv, :stock_item, fn fsi-> %>
                            <%= hidden_input fsi, :count_on_hand, value: 0 %>
-
                            <% end %>
                          <%= if options.input== :variant do %>
                         <%= Kaffy.ResourceForm.kaffy_input @conn, @changeset, fv, field, options %>
                         <% end %>
+
                         <% end %>
 
                       <% end  %>
