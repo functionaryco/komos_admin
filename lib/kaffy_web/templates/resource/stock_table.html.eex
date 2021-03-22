@@ -9,7 +9,7 @@
   </thead>
   <tbody>
     <%= for entry <- @entries do %>
-      <tr>
+      <tr x-data="{count: <%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:count_on_hand,@fields[:count_on_hand]}) %>, add: 0, res: <%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:count_on_hand,@fields[:count_on_hand]}) %>}">
         <td>
           <div style="display:flex;">
             <div style="margin-right: 20px;"><%=img_tag(Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:image_url, @fields[:image_url]}), border: 1, height: 100, width: 100) %></div>
@@ -26,11 +26,20 @@
         </td>
         <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:stock_location_id,@fields[:stock_location_id]}) %></td>
         <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:back_orderable,@fields[:back_orderable]}) %></td>
-        <td><%= Kaffy.ResourceSchema.kaffy_field_value(@conn, entry, {:count_on_hand, @fields[:count_on_hand]}) %></td>
+        <td><span x-text="res"></span></td>
         <td>
-          <%=render "stock_count_update.html",conn: @conn,context: @context, resource: @resource,changeset: @sm_changeset, stock_item_id: entry.id%>
-        </td>
-      </tr>
-    <% end %>
-  </tbody>
+          <div style="display:flex;">
+            <%= f = form_for(@sm_changeset, Kaffy.Utils.router().kaffy_resource_path(@conn, :create, @context, "stock_movement"), multipart: true) %>
+            <div style="display:flex;">
+              <%= number_input f, :quantity, "x-model": "add","@change": "res= parseInt(count)+parseInt(add); document.getElementById('submit#{entry.id}').style.display=''; document.getElementById('clear#{entry.id}').style.display='';" %>
+              <%= hidden_input f, :stock_item_id, value: entry.id %>
+              <%= submit "",style: "display:none;background-color: Transparent;border-color: Transparent", id: "submit#{entry.id}", class: "fa fa-check"  %>
+            </div>
+          </form>
+          <button @click="add=0; res=count;" id="<%="clear#{entry.id}"%>" style="display:none;background-color: Transparent;border-color: Transparent"><i class="fa fa-times"></i></button>
+        </div>
+      </td>
+    </tr>
+  <% end %>
+</tbody>
 </table>
