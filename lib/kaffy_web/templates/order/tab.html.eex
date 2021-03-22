@@ -12,7 +12,7 @@
     <%= link "Adjustments", to: Kaffy.Utils.router().kaffy_order_path(@conn, :adjustments, @context,@resource, @order_id), class: "nav-link" %>
   </li>
   <li class="nav-item">
-    <%= link "Payments", to: Kaffy.Utils.router().kaffy_product_path(@conn, :index, @context,@order_id, "product_property"), class: "nav-link" %>
+    <%= link "Payments", to: Kaffy.Utils.router().kaffy_product_path(@conn, :index, @context,@order_id, "payment"), class: "nav-link" %>
   </li>
   <li class="nav-item">
     <%= link "Confirm", to: Kaffy.Utils.router().kaffy_product_path(@conn, :index, @context,@order_id, "stock_item"), class: "nav-link" %>

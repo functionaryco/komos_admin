@@ -295,6 +295,46 @@ defmodule KaffyWeb.OrderController do
     end
   end
 
+  def payments(conn, %{
+        "context" => context,
+        "resource" => "payment" = resource,
+        "order_id" => id
+      }) do
+    my_resource = Kaffy.Utils.get_resource(conn, context, "order")
+    schema = my_resource[:schema]
+    resource_name = Kaffy.ResourceAdmin.singular_name(my_resource)
+
+    payment_resource = Kaffy.Utils.get_resource(conn, "payment", "payment")
+
+    {_filtered_count, payments_list} =
+      Kaffy.ResourceQuery.list_resource(conn, payment_resource, %{})
+
+    case can_proceed?(my_resource, conn) do
+      false ->
+        unauthorized_access(conn)
+
+      true ->
+        if entry = Kaffy.ResourceQuery.fetch_resource(conn, my_resource, id) do
+          render(conn, "payment_index.html",
+            layout: {KaffyWeb.LayoutView, "app.html"},
+            context: context,
+            resource: resource,
+            my_resource: my_resource,
+            resource_name: resource_name,
+            schema: schema,
+            entry: entry,
+            adjustments: payments_list,
+            order_id: id
+          )
+        else
+          put_flash(conn, :error, "The resource you are trying to visit does not exist!")
+          |> redirect(
+            to: Kaffy.Utils.router().kaffy_resource_path(conn, :index, context, resource)
+          )
+        end
+    end
+  end
+
   def update_customer(
         conn,
         %{"context" => context, "resource" => resource, "order_id" => id} = params
